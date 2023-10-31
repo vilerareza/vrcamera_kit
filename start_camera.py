@@ -240,6 +240,7 @@ async def process_frame():
     while True:
         try:
             frame = await asyncio.to_thread(wait, output)
+            print ('frame')
         except:
             break
 

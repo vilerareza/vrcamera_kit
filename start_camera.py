@@ -11,6 +11,8 @@ import json
 from get_rec_file import get_rec_file
 import base64
 
+from face_detector import FaceDetector
+
 
 async def on_control(message):
     # Callback function for control message receved by control websocket
@@ -228,9 +230,13 @@ async def ws_to_client():
         await asyncio.Future()
 
 
-async def process_frame():
+async def process_frame(frame_processors=['face']):
     
     global output
+
+    # Frame processor objects
+    if 'face' in frame_processors:
+        face_detector = FaceDetector()
 
     def wait (output):
         with output.condition:
@@ -240,12 +246,16 @@ async def process_frame():
     while True:
         try:
             frame = await asyncio.to_thread(wait, output)
-            print ('frame')
+            faces, frame = face_detector(frame)
+            if faces:
+                print ('frame')
+                print (faces)
+                
         except:
             break
 
 
-async def main(camera, output, frame_size, frame_rate, serverHost):
+async def main(camera, output, frame_size, frame_rate):
     # Start camera
     task_camera = asyncio.create_task(camera.start_camera(output, frame_size = frame_size, frame_rate = frame_rate))
     # Open connection to server
@@ -282,10 +292,6 @@ if __name__ == '__main__':
     output = StreamingOutput()
     is_recording = True
 
-    # Server host
-    serverHost = "vrserver99.local"
-    t_reconnection = 3
-
     # Servos
     try:
         servoX = Servo(channel=0)
@@ -303,13 +309,15 @@ if __name__ == '__main__':
     mp4_buffer_path = '../mp4buf/'
     # Rec file bytes
     rec_file_dict = {}
-    
+
+
     try:
         asyncio.run (main(camera=camera, 
                           output=output, 
                           frame_size=frame_size, 
-                          frame_rate=frame_rate, 
-                          serverHost=serverHost ))
+                          frame_rate=frame_rate
+                          ))
+        
     except:
         # Resetting indicators state before exit.
         indicator_1.off()

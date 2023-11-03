@@ -1,5 +1,8 @@
 import os
 import asyncio
+import base64
+import numpy as np
+import json
 import websockets
 from camera import Camera
 from streamingoutput import StreamingOutput
@@ -7,11 +10,12 @@ from streamingoutput import StreamingOutput
 from servo import Servo
 from light import Light
 from indicator import Indicator
-import json
-from get_rec_file import get_rec_file
-import base64
 
-from face_detector import FaceDetector
+
+from get_rec_file import get_rec_file
+
+
+# from face_detector import FaceDetector
 
 
 async def on_control(message):
@@ -236,7 +240,8 @@ async def process_frame(frame_processors=['face']):
 
     # Frame processor objects
     if 'face' in frame_processors:
-        face_detector = FaceDetector()
+        #face_detector = FaceDetector()
+        pass
 
     def wait (output):
         with output.condition:
@@ -246,10 +251,17 @@ async def process_frame(frame_processors=['face']):
     while True:
         try:
             frame = await asyncio.to_thread(wait, output)
-            faces, frame = face_detector(frame)
-            if faces:
-                print ('frame')
-                print (faces)
+            npFrame = np.asarray(bytearray(frame))
+
+            print (type(npFrame), npFrame.shape)
+            #if npFrame.any():
+            #    try:
+            #        img = imdecode(npFrame, 1)
+                
+            # faces, frame = face_detector(frame)
+            # if faces:
+                # print ('frame')
+                # print (faces)
                 
         except:
             break

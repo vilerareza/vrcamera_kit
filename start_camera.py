@@ -251,17 +251,11 @@ async def process_frame(frame_processors=['face']):
     while True:
         try:
             frame = await asyncio.to_thread(wait, output)
-            npFrame = np.asarray(bytearray(frame))
 
-            print (type(npFrame), npFrame.shape)
-            #if npFrame.any():
-            #    try:
-            #        img = imdecode(npFrame, 1)
                 
-            # faces, frame = face_detector(frame)
-            # if faces:
-                # print ('frame')
-                # print (faces)
+            faces, frame = face_detector(frame)
+            if faces:
+                print (faces)
                 
         except:
             break

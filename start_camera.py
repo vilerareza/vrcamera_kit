@@ -15,7 +15,7 @@ from indicator import Indicator
 from get_rec_file import get_rec_file
 
 
-# from face_detector import FaceDetector
+from face_detector import FaceDetector
 
 
 async def on_control(message):

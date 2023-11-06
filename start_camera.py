@@ -236,6 +236,7 @@ async def ws_to_client():
 
 async def process_frame(frame_processors=['face']):
     
+    print ('process')
     global output
 
     # Frame processor objects

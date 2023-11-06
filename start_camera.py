@@ -251,7 +251,7 @@ async def process_frame(frame_processors=['face']):
 
     while True:
         #try:
-        print (frame)
+        print ('frame')
         frame = await asyncio.to_thread(wait, output)
 
             

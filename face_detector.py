@@ -12,26 +12,26 @@ class FaceDetector():
 
     def detect_face(self, frame):
 
-        try:
+        #try:
 
-            np_frame = np.asarray(bytearray(frame))
+        np_frame = np.asarray(bytearray(frame))
 
-            if np_frame.any():
-                #try:
-                img = cv.imdecode(np_frame, 1)
-                #except:
-                #    pass
+        if np_frame.any():
+            #try:
+            img = cv.imdecode(np_frame, 1)
+            #except:
+            #    pass
 
-            # Conversion to gray
-            img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        # Conversion to gray
+        img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
-            # Face detection
-            faces = self.face_detector(img_gray, 0)
+        # Face detection
+        faces = self.face_detector(img_gray, 0)
 
             # Do for every face detected
             # for face in faces:
 
-            return None, frame
+        return None, frame
 
-        finally:
-            return faces, frame
+        # finally:
+        #     return faces, frame

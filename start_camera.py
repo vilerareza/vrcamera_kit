@@ -253,8 +253,6 @@ async def process_frame(frame_processors=['face']):
         #try:
         
         frame = await asyncio.to_thread(wait, output)
-        
-        print ('frame')
             
         faces, frame = face_detector(frame)
         #     if faces:

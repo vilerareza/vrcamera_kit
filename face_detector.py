@@ -13,7 +13,7 @@ class FaceDetector():
     def detect_face(self, frame):
 
         #try:
-
+        print ('detect')
         np_frame = np.asarray(bytearray(frame))
 
         if np_frame.any():

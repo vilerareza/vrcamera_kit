@@ -318,15 +318,15 @@ if __name__ == '__main__':
     rec_file_dict = {}
 
 
-    try:
-        asyncio.run (main(camera=camera, 
-                          output=output, 
-                          frame_size=frame_size, 
-                          frame_rate=frame_rate
-                          ))
+    #try:
+    asyncio.run (main(camera=camera, 
+                        output=output, 
+                        frame_size=frame_size, 
+                        frame_rate=frame_rate
+                        ))
         
-    except:
-        # Resetting indicators state before exit.
-        indicator_1.off()
-        indicator_0.on()
-        print ('end')
+    # except:
+    #     # Resetting indicators state before exit.
+    #     indicator_1.off()
+    #     indicator_0.on()
+    #     print ('end')

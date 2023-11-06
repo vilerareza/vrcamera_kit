@@ -241,7 +241,7 @@ async def process_frame(frame_processors=['face']):
 
     # Frame processor objects
     if 'face' in frame_processors:
-        #face_detector = FaceDetector()
+        face_detector = FaceDetector()
         pass
 
     def wait (output):

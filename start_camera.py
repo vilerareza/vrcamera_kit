@@ -249,16 +249,16 @@ async def process_frame(frame_processors=['face']):
             return output.frame
 
     while True:
-        try:
-            frame = await asyncio.to_thread(wait, output)
+        #try:
+        frame = await asyncio.to_thread(wait, output)
 
+            
+        faces, frame = face_detector(frame)
+        #     if faces:
+        #         print (faces)
                 
-            faces, frame = face_detector(frame)
-            if faces:
-                print (faces)
-                
-        except:
-            break
+        # except:
+        #     break
 
 
 async def main(camera, output, frame_size, frame_rate):

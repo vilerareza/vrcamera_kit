@@ -13,7 +13,6 @@ class FaceDetector():
     def detect_face(self, frame_raw):
 
         #try:
-        print ('detect')
         np_frame = np.asarray(bytearray(frame_raw))
 
         if np_frame.any():
@@ -28,8 +27,8 @@ class FaceDetector():
         # Face detection
         faces = self.face_detector(img_gray, 0)
 
-            # Do for every face detected
-            # for face in faces:
+        # Do for every face detected
+        # for face in faces:
 
         return faces, img
 

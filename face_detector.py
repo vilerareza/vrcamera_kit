@@ -10,11 +10,11 @@ class FaceDetector():
         self.face_detector = dlib.get_frontal_face_detector()
 
 
-    def detect_face(self, frame):
+    def detect_face(self, frame_raw):
 
         #try:
         print ('detect')
-        np_frame = np.asarray(bytearray(frame))
+        np_frame = np.asarray(bytearray(frame_raw))
 
         if np_frame.any():
             #try:
@@ -31,7 +31,7 @@ class FaceDetector():
             # Do for every face detected
             # for face in faces:
 
-        return None, frame
+        return faces, img
 
         # finally:
         #     return faces, frame

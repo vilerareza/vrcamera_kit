@@ -14,7 +14,6 @@ from indicator import Indicator
 
 from get_rec_file import get_rec_file
 
-
 from face_detector import FaceDetector
 
 
@@ -235,8 +234,7 @@ async def ws_to_client():
 
 
 async def process_frame(frame_processors=['face']):
-    
-    print ('process')
+
     global output
 
     # Frame processor objects
@@ -252,9 +250,10 @@ async def process_frame(frame_processors=['face']):
     while True:
         try:
         
-            frame = await asyncio.to_thread(wait, output)
+            frame_raw = await asyncio.to_thread(wait, output)
                 
-            faces, frame = face_detector(frame)
+            faces, frame = face_detector.detect_face(frame_raw)
+            print (faces)
         #     if faces:
         #         print (faces)
                 
@@ -319,15 +318,15 @@ if __name__ == '__main__':
     rec_file_dict = {}
 
 
-    #try:
-    asyncio.run (main(camera=camera, 
-                        output=output, 
-                        frame_size=frame_size, 
-                        frame_rate=frame_rate
-                        ))
+    try:
+        asyncio.run (main(camera=camera, 
+                            output=output, 
+                            frame_size=frame_size, 
+                            frame_rate=frame_rate
+                            ))
         
-    # except:
-    #     # Resetting indicators state before exit.
-    #     indicator_1.off()
-    #     indicator_0.on()
-    #     print ('end')
+    except:
+        # Resetting indicators state before exit.
+        indicator_1.off()
+        indicator_0.on()
+        print ('end')

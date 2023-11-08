@@ -34,9 +34,10 @@ class FaceDetector():
         # Do for every face detected
         # Draw face
         for face in faces:
-            rect = self.get_face_rect(img, face)
+            start_pt, end_pt = self.get_face_rect(img, face)
             cv.rectangle(img, 
-                         rect, 
+                         start_pt,
+                         end_pt, 
                          (0,255,0), 
                          3)
 

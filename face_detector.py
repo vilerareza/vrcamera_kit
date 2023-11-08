@@ -1,6 +1,7 @@
 import numpy as np
 import dlib
 import cv2 as cv
+import time
 
 class FaceDetector():
     
@@ -41,6 +42,7 @@ class FaceDetector():
                          (0,255,0), 
                          3)
 
+        cv.imwrite(f'face_{time.time()[-5:]}.png', img)
         return faces, img
 
         # finally:

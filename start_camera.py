@@ -249,13 +249,11 @@ async def process_frame(frame_processors=['face']):
 
     while True:
         try:
-        
+            
+            # Wait for new frame
             frame_raw = await asyncio.to_thread(wait, output)
-                
+            # Detect faces
             faces, frame = face_detector.detect_face(frame_raw)
-            print (len(faces), faces)
-        #     if faces:
-        #         print (faces)
                 
         except Exception as e:
             print (e)

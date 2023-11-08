@@ -42,7 +42,7 @@ class FaceDetector():
                          (0,255,0), 
                          3)
 
-        cv.imwrite(f'face_{time.time()[-5:]}.png', img)
+        cv.imwrite(f'face_{str(time.time())[-5:]}.png', img)
         return faces, img
 
         # finally:

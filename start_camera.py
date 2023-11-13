@@ -304,7 +304,7 @@ async def process_frame(db_path, frame_processors=['face']):
 async def main(camera, output, frame_size, frame_rate, db_path, db_table):
 
     # Check if detection database exists. Otherwise create it.
-    if not os.path.exists(db_path, db_table):
+    if not os.path.exists(db_path):
         # Create fresh db
         cmd = f'''CREATE TABLE {db_table} (
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,

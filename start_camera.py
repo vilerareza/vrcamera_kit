@@ -4,17 +4,58 @@ import base64
 import numpy as np
 import json
 import websockets
+import sqlite3
+
 from camera import Camera
 from streamingoutput import StreamingOutput
 # from streamingoutput2 import StreamingOutput2
 from servo import Servo
 from light import Light
 from indicator import Indicator
-
-
 from get_rec_file import get_rec_file
-
 from face_detector import FaceDetector
+
+
+# Indicators
+indicator_0 = Indicator(pin = 22)
+indicator_1 = Indicator(pin = 27)
+# Resetting indicators state before exit.
+indicator_1.off()
+indicator_0.on()
+
+# Camera object
+camera = Camera([indicator_1, indicator_0])
+# Frame size
+#frame_size = (640, 480)
+frame_size = (1280, 720)
+# Frame rate
+frame_rate = 15   
+
+# Streaming output object
+output = StreamingOutput()
+is_recording = True
+
+# Servos
+try:
+    servoX = Servo(channel=0)
+    servoY = Servo(channel=1)
+except:
+    servoX = None ; servoY = None
+    print ('Warning: Servos are not connected!')
+
+# Light
+light = Light(pin = 17)
+
+# Recording files directory
+rec_path = '../rec/'
+# Recording files directory
+mp4_buffer_path = '../mp4buf/'
+# Rec file bytes
+rec_file_dict = {}
+
+# Db path
+db_path = 'db.sqlite'
+db_table = 'detections'
 
 
 async def on_control(message):
@@ -233,13 +274,13 @@ async def ws_to_client():
         await asyncio.Future()
 
 
-async def process_frame(frame_processors=['face']):
+async def process_frame(db_path, frame_processors=['face']):
 
     global output
 
     # Frame processor objects
     if 'face' in frame_processors:
-        face_detector = FaceDetector()
+        face_detector = FaceDetector(db_path)
         pass
 
     def wait (output):
@@ -260,67 +301,50 @@ async def process_frame(frame_processors=['face']):
             break
 
 
-async def main(camera, output, frame_size, frame_rate):
+async def main(camera, output, frame_size, frame_rate, db_path, db_table):
+
+    # Check if detection database exists. Otherwise create it.
+    if not os.path.exists(db_path, db_table):
+        # Create fresh db
+        cmd = f'''CREATE TABLE {db_table} (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        det_type TEXT(10) NOT NULL,
+        det_datetime TEXT(20) NOT NULL,
+        img_data BLOB NULL
+        );
+        '''
+        with sqlite3.connect(db_path) as conn:
+            conn.execute('PRAGMA encoding="UTF-8";')
+            conn.execute(cmd)
+            conn.commit()
+
     # Start camera
     task_camera = asyncio.create_task(camera.start_camera(output, frame_size = frame_size, frame_rate = frame_rate))
     # Open connection to server
-    task_ws_server = asyncio.create_task(process_frame())
+    task_ws_server = asyncio.create_task(process_frame(db_path=db_path, db_table=db_table))
     # Listening connection from client
     task_ws_client = asyncio.create_task(ws_to_client())
+
     await task_camera
     await task_ws_server
     await task_ws_client
+
     # Resetting indicators state before exit.
     indicator_1.off()
     indicator_0.on()
     print ('end')
 
 
+
 if __name__ == '__main__':
-
-    # Indicators
-    indicator_0 = Indicator(pin = 22)
-    indicator_1 = Indicator(pin = 27)
-    # Resetting indicators state before exit.
-    indicator_1.off()
-    indicator_0.on()
-
-    # Camera object
-    camera = Camera([indicator_1, indicator_0])
-    # Frame size
-    #frame_size = (640, 480)
-    frame_size = (1280, 720)
-    # Frame rate
-    frame_rate = 15   
-    
-    # Streaming output object
-    output = StreamingOutput()
-    is_recording = True
-
-    # Servos
-    try:
-        servoX = Servo(channel=0)
-        servoY = Servo(channel=1)
-    except:
-        servoX = None ; servoY = None
-        print ('Warning: Servos are not connected!')
-
-    # Light
-    light = Light(pin = 17)
-
-    # Recording files directory
-    rec_path = '../rec/'
-    # Recording files directory
-    mp4_buffer_path = '../mp4buf/'
-    # Rec file bytes
-    rec_file_dict = {}
-
 
     try:
         asyncio.run (main(camera=camera, 
                             output=output, 
                             frame_size=frame_size, 
-                            frame_rate=frame_rate
+                            frame_rate=frame_rate,
+                            db_path=db_path,
+                            db_table=db_table
                             ))
         
     except:

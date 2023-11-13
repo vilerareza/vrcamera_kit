@@ -2,13 +2,18 @@ import numpy as np
 import dlib
 import cv2 as cv
 import time
+import pickle
+import sqlite3
+
 
 class FaceDetector():
     
-    def __init__(self) -> None:
+    def __init__(self, db_path, db_table) -> None:
 
         # dlib face detector
         self.face_detector = dlib.get_frontal_face_detector()
+        self.db_path = db_path
+        self.db_table = db_table
 
 
     def get_face_rect(self, img, dlib_rect):
@@ -17,6 +22,18 @@ class FaceDetector():
         x2 = min(dlib_rect.right(), img.shape[1])
         y2 = min(dlib_rect.bottom(), img.shape[0])
         return [(x1,y1), (x2,y2)]
+
+
+    def insert_to_db(self, db_path, db_table, det_type, det_datetime, arg3=''):
+            try:
+                cmd = f"""insert into {db_table}(det_type, det_datetime) values (?, ?, ?)"""
+                with sqlite3.connect(db_path) as conn:
+                    conn.execute(cmd, (det_type, det_datetime, arg3))
+                    conn.commit()
+                print ('inserted to db')
+            except Exception as e:
+                print (f'[ERROR] {e}: Insert clip to cache failed, clip cache database does not exist or might be in use!')
+
 
     def detect_face(self, frame_raw, bbox = True):
         
@@ -32,17 +49,20 @@ class FaceDetector():
 
         print (len(faces), faces)
         
-        # Do for every face detected
-        # Draw face
-        for face in faces:
-            start_pt, end_pt = self.get_face_rect(img, face)
-            cv.rectangle(img, 
-                         start_pt,
-                         end_pt, 
-                         (0,255,0), 
-                         3)
+        # Process on face exists
         if len(faces) > 0:
-            cv.imwrite(f'face_{str(time.time())[-5:]}.png', img)
+        # Draw rectangle on faces
+            if bbox:
+                for face in faces:
+                    start_pt, end_pt = self.get_face_rect(img, face)
+                    cv.rectangle(img, 
+                                start_pt,
+                                end_pt, 
+                                (0,255,0), 
+                                3)
+
+                  
+                # cv.imwrite(f'face_{str(time.time())[-5:]}.png', img)
         
         return faces, img
 

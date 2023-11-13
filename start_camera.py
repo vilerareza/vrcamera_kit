@@ -274,7 +274,7 @@ async def ws_to_client():
         await asyncio.Future()
 
 
-async def process_frame(db_path, frame_processors=['face']):
+async def process_frame(db_path, db_table, frame_processors=['face']):
 
     global output
 

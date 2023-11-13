@@ -280,7 +280,7 @@ async def process_frame(db_path, db_table, frame_processors=['face']):
 
     # Frame processor objects
     if 'face' in frame_processors:
-        face_detector = FaceDetector(db_path)
+        face_detector = FaceDetector(db_path, db_table)
         pass
 
     def wait (output):

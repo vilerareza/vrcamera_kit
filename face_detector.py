@@ -25,14 +25,14 @@ class FaceDetector():
 
 
     def insert_to_db(self, db_path, db_table, det_type, det_datetime, arg3=''):
-            try:
-                cmd = f"""insert into {db_table}(det_type, det_datetime) values (?, ?, ?)"""
-                with sqlite3.connect(db_path) as conn:
-                    conn.execute(cmd, (det_type, det_datetime, arg3))
-                    conn.commit()
-                print ('inserted to db')
-            except Exception as e:
-                print (f'[ERROR] {e}: Insert clip to cache failed, clip cache database does not exist or might be in use!')
+        try:
+            cmd = f"""insert into {db_table}(det_type, det_datetime) values (?, ?, ?)"""
+            with sqlite3.connect(db_path) as conn:
+                conn.execute(cmd, (det_type, det_datetime, arg3))
+                conn.commit()
+            print ('inserted to db')
+        except Exception as e:
+            print (f'[ERROR] {e}: Insert clip to cache failed, clip cache database does not exist or might be in use!')
 
 
     def detect_face(self, frame_raw, bbox = True):

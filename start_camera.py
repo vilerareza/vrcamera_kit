@@ -338,17 +338,17 @@ async def main(camera, output, frame_size, frame_rate, db_path, db_table):
 
 if __name__ == '__main__':
 
-    try:
-        asyncio.run (main(camera=camera, 
-                            output=output, 
-                            frame_size=frame_size, 
-                            frame_rate=frame_rate,
-                            db_path=db_path,
-                            db_table=db_table
-                            ))
+    # try:
+    asyncio.run (main(camera=camera, 
+                        output=output, 
+                        frame_size=frame_size, 
+                        frame_rate=frame_rate,
+                        db_path=db_path,
+                        db_table=db_table
+                        ))
         
-    except:
-        # Resetting indicators state before exit.
-        indicator_1.off()
-        indicator_0.on()
-        print ('end')
+    # except:
+    #     # Resetting indicators state before exit.
+    #     indicator_1.off()
+    #     indicator_0.on()
+    #     print ('end')

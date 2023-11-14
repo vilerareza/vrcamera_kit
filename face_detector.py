@@ -1,7 +1,7 @@
 import numpy as np
 import dlib
 import cv2 as cv
-import time
+from datetime import datetime
 import pickle
 import sqlite3
 
@@ -47,13 +47,26 @@ class FaceDetector():
         # Face detection
         faces = self.face_detector(img_gray, 0)
 
+        # time stamp
+        date_time = datetime.now().strftime('%d-%m-%y, %H:%M')
+        
         print (len(faces), faces)
         
         # Process on face exists
         if len(faces) > 0:
-        # Draw rectangle on faces
-            if bbox:
-                for face in faces:
+        
+            
+            for face in faces:
+            
+                # Insert the face detection to database
+                self.insert_to_db(self.db_path, 
+                                  self.db_table, 
+                                  'face',
+                                  date_time
+                                  )
+
+                # Draw rectangle on faces
+                if bbox:
                     start_pt, end_pt = self.get_face_rect(img, face)
                     cv.rectangle(img, 
                                 start_pt,

@@ -28,7 +28,7 @@ class FaceDetector():
         try:
             cmd = f"""insert into {db_table}(det_type, det_datetime, img_data) values (?, ?, ?)"""
             with sqlite3.connect(db_path) as conn:
-                conn.execute(cmd, (det_type, det_datetime))
+                conn.execute(cmd, (det_type, det_datetime, img_blob))
                 conn.commit()
             print ('inserted to db')
         except Exception as e:

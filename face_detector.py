@@ -24,9 +24,9 @@ class FaceDetector():
         return [(x1,y1), (x2,y2)]
 
 
-    def insert_to_db(self, db_path, db_table, det_type, det_datetime, arg3=''):
+    def insert_to_db(self, db_path, db_table, det_type, det_datetime, img_blob=''):
         try:
-            cmd = f"""insert into {db_table}(det_type, det_datetime) values (?, ?)"""
+            cmd = f"""insert into {db_table}(det_type, det_datetime, img_data) values (?, ?, ?)"""
             with sqlite3.connect(db_path) as conn:
                 conn.execute(cmd, (det_type, det_datetime))
                 conn.commit()
@@ -55,16 +55,8 @@ class FaceDetector():
         # Process on face exists
         if len(faces) > 0:
         
-            
             for face in faces:
             
-                # Insert the face detection to database
-                self.insert_to_db(self.db_path, 
-                                  self.db_table, 
-                                  'face',
-                                  date_time
-                                  )
-
                 # Draw rectangle on faces
                 if bbox:
                     start_pt, end_pt = self.get_face_rect(img, face)
@@ -74,7 +66,14 @@ class FaceDetector():
                                 (0,255,0), 
                                 3)
 
-                  
+                # Insert the face detection to database
+                self.insert_to_db(self.db_path, 
+                                  self.db_table, 
+                                  'face',
+                                  date_time,
+                                  pickle.dumps(img)
+                                  )
+                
                 # cv.imwrite(f'face_{str(time.time())[-5:]}.png', img)
         
         return faces, img

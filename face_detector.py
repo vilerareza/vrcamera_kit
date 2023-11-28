@@ -1,19 +1,23 @@
+import os
 import numpy as np
 import dlib
 import cv2 as cv
+import time
 from datetime import datetime
 import pickle
 import sqlite3
+import base64
 
 
 class FaceDetector():
     
-    def __init__(self, db_path, db_table) -> None:
+    def __init__(self, db_path, db_table, img_dir) -> None:
 
         # dlib face detector
         self.face_detector = dlib.get_frontal_face_detector()
         self.db_path = db_path
         self.db_table = db_table
+        self.img_dir = img_dir
 
 
     def get_face_rect(self, img, dlib_rect):
@@ -24,11 +28,16 @@ class FaceDetector():
         return [(x1,y1), (x2,y2)]
 
 
-    def insert_to_db(self, db_path, db_table, det_type, det_datetime, img_blob=''):
+    def insert_to_db(self, 
+                     db_path, 
+                     db_table, 
+                     det_type, 
+                     det_datetime, 
+                     img_file):
         try:
-            cmd = f"""insert into {db_table}(det_type, det_datetime, img_data) values (?, ?, ?)"""
+            cmd = f"""insert into {db_table}(det_type, det_datetime, img_file) values (?, ?, ?)"""
             with sqlite3.connect(db_path) as conn:
-                conn.execute(cmd, (det_type, det_datetime, img_blob))
+                conn.execute(cmd, (det_type, det_datetime, img_file))
                 conn.commit()
             print ('inserted to db')
         except Exception as e:
@@ -66,12 +75,16 @@ class FaceDetector():
                                 (0,255,0), 
                                 3)
 
+                # Saving the frame image
+                filename = str(time.time()).replace('.','')
+                cv.imwrite(os.path.join(self.img_dir, f'{filename}.png'), img)
+
                 # Insert the face detection to database
-                self.insert_to_db(self.db_path, 
-                                  self.db_table, 
-                                  'face',
-                                  date_time,
-                                  pickle.dumps(img)
+                self.insert_to_db(db_path = self.db_path, 
+                                  db_table = self.db_table, 
+                                  det_type='face',
+                                  det_date_time = date_time,
+                                  filename = filename
                                   )
                 
                 # cv.imwrite(f'face_{str(time.time())[-5:]}.png', img)

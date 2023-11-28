@@ -57,6 +57,9 @@ rec_file_dict = {}
 db_path = 'db.sqlite'
 db_table = 'detections'
 
+# Directory for saving image files
+img_dir = 'images/'
+
 
 async def on_control(message):
     # Callback function for control message receved by control websocket
@@ -274,23 +277,23 @@ async def ws_to_client():
         await asyncio.Future()
 
 
-async def process_frame(db_path, db_table, frame_processors=['face']):
+async def process_frame(db_path, db_table, img_dir, frame_processors=['face']):
 
     global output
-
-    # Frame processor objects
-    if 'face' in frame_processors:
-        face_detector = FaceDetector(db_path, db_table)
-        pass
 
     def wait (output):
         with output.condition:
             output.condition.wait()
             return output.frame
 
+    # Frame processor objects
+    if 'face' in frame_processors:
+        face_detector = FaceDetector(db_path, db_table, img_dir)
+        pass
+
     while True:
+
         try:
-            
             # Wait for new frame
             frame_raw = await asyncio.to_thread(wait, output)
             # Detect faces
@@ -301,16 +304,23 @@ async def process_frame(db_path, db_table, frame_processors=['face']):
             break
 
 
-async def main(camera, output, frame_size, frame_rate, db_path, db_table):
+async def main(camera, output, frame_size, frame_rate, db_path, db_table, img_dir):
 
     # Check if detection database exists. Otherwise create it.
     if not os.path.exists(db_path):
         # Create fresh db
+        # cmd = f'''CREATE TABLE {db_table} (
+        # id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        # det_type TEXT(10) NOT NULL,
+        # det_datetime TEXT(20) NOT NULL,
+        # img_data BLOB NULL
+        # );
+        # '''
         cmd = f'''CREATE TABLE {db_table} (
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         det_type TEXT(10) NOT NULL,
         det_datetime TEXT(20) NOT NULL,
-        img_data BLOB NULL
+        img_file TEXT (20) NULL
         );
         '''
         with sqlite3.connect(db_path) as conn:
@@ -319,14 +329,18 @@ async def main(camera, output, frame_size, frame_rate, db_path, db_table):
             conn.commit()
 
     # Start camera
-    task_camera = asyncio.create_task(camera.start_camera(output, frame_size = frame_size, frame_rate = frame_rate))
-    # Open connection to server
-    task_ws_server = asyncio.create_task(process_frame(db_path=db_path, db_table=db_table))
+    task_camera = asyncio.create_task(camera.start_camera(output, 
+                                                          frame_size = frame_size, 
+                                                          frame_rate = frame_rate))
+    # Create the frame processor task
+    task_process_frame = asyncio.create_task(process_frame(db_path=db_path, 
+                                                           db_table=db_table, 
+                                                           img_dir=img_dir))
     # Listening connection from client
     task_ws_client = asyncio.create_task(ws_to_client())
 
     await task_camera
-    await task_ws_server
+    await task_process_frame
     await task_ws_client
 
     # Resetting indicators state before exit.
@@ -344,7 +358,8 @@ if __name__ == '__main__':
                         frame_size=frame_size, 
                         frame_rate=frame_rate,
                         db_path=db_path,
-                        db_table=db_table
+                        db_table=db_table,
+                        img_dir=img_dir
                         ))
         
     # except:

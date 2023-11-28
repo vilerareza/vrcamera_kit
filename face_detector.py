@@ -83,7 +83,7 @@ class FaceDetector():
                 self.insert_to_db(db_path = self.db_path, 
                                   db_table = self.db_table, 
                                   det_type='face',
-                                  det_date_time = date_time,
+                                  det_datetime = date_time,
                                   filename = filename
                                   )
                 

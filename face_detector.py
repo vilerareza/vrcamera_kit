@@ -76,15 +76,15 @@ class FaceDetector():
                                 3)
 
                 # Saving the frame image
-                filename = str(time.time()).replace('.','')
-                cv.imwrite(os.path.join(self.img_dir, f'{filename}.png'), img)
+                file_name = f"{str(time.time()).replace('.','')}.png"
+                cv.imwrite(os.path.join(self.img_dir, file_name), img)
 
                 # Insert the face detection to database
                 self.insert_to_db(db_path = self.db_path, 
                                   db_table = self.db_table, 
                                   det_type='face',
                                   det_datetime = date_time,
-                                  img_file = filename
+                                  img_file = file_name
                                   )
                 
                 # cv.imwrite(f'face_{str(time.time())[-5:]}.png', img)

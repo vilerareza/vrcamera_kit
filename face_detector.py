@@ -84,7 +84,7 @@ class FaceDetector():
                                   db_table = self.db_table, 
                                   det_type='face',
                                   det_datetime = date_time,
-                                  filename = filename
+                                  img_file = filename
                                   )
                 
                 # cv.imwrite(f'face_{str(time.time())[-5:]}.png', img)

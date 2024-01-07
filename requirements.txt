@@ -1,0 +1,4 @@
+picamera
+adafruit-circuitpython-servokit
+websockets
+dlib
